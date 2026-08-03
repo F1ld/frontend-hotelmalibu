@@ -1,0 +1,81 @@
+<!-- src/app/features/huespedes/huespedes-list/huespedes-list.component.html -->
+<section class="huespedes">
+  <header class="huespedes__header">
+    <h1>Huéspedes</h1>
+    <button type="button" (click)="abrirCreacion()">Nuevo huésped</button>
+  </header>
+
+  @if (error()) {
+    <p class="huespedes__error">{{ error() }}</p>
+  }
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else {
+    <table class="huespedes__tabla">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Documento</th>
+          <th>Teléfono</th>
+          <th>Email</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (huesped of huespedes(); track huesped.id) {
+          <tr>
+            <td>{{ huesped.nombre }}</td>
+            <td>{{ huesped.documento_identidad }}</td>
+            <td>{{ huesped.telefono }}</td>
+            <td>{{ huesped.email }}</td>
+            <td>
+              <button type="button" (click)="abrirEdicion(huesped)">Editar</button>
+              <button type="button" (click)="eliminar(huesped)">Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5">No hay huéspedes registrados.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (mostrandoFormulario()) {
+    <form class="huespedes__formulario" (ngSubmit)="guardar()">
+      <h2>{{ huespedEnEdicion() ? 'Editar huésped' : 'Nuevo huésped' }}</h2>
+
+      <label>
+        Nombre
+        <input type="text" name="nombre" [(ngModel)]="formulario.nombre" required />
+      </label>
+
+      <label>
+        Documento de identidad
+        <input
+          type="text"
+          name="documento_identidad"
+          [(ngModel)]="formulario.documento_identidad"
+          required
+        />
+      </label>
+
+      <label>
+        Teléfono
+        <input type="text" name="telefono" [(ngModel)]="formulario.telefono" />
+      </label>
+
+      <label>
+        Email
+        <input type="email" name="email" [(ngModel)]="formulario.email" />
+      </label>
+
+      <div class="huespedes__formulario-acciones">
+        <button type="submit">Guardar</button>
+        <button type="button" (click)="cancelarFormulario()">Cancelar</button>
+      </div>
+    </form>
+  }
+</section>

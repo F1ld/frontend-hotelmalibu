@@ -1,0 +1,77 @@
+<!-- src/app/features/habitaciones/habitaciones-list/habitaciones-list.component.html -->
+<section class="habitaciones">
+  <header class="habitaciones__header">
+    <h1>Habitaciones</h1>
+    @if (esAdmin()) {
+      <button type="button" (click)="abrirCreacion()">Nueva habitación</button>
+    }
+  </header>
+
+  @if (error()) {
+    <p class="habitaciones__error">{{ error() }}</p>
+  }
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else {
+    <table class="habitaciones__tabla">
+      <thead>
+        <tr>
+          <th>Número</th>
+          <th>Tipo</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (habitacion of habitaciones(); track habitacion.id) {
+          <tr>
+            <td>{{ habitacion.numero }}</td>
+            <td>{{ habitacion.tipo_habitacion_nombre }}</td>
+            <td>{{ habitacion.estado }}</td>
+            <td class="habitaciones__acciones">
+              @for (destino of transicionesDisponibles(habitacion); track destino) {
+                <button type="button" (click)="cambiarEstado(habitacion, destino)">
+                  → {{ destino }}
+                </button>
+              }
+              @if (esAdmin()) {
+                <button type="button" (click)="abrirEdicion(habitacion)">Editar</button>
+                <button type="button" (click)="eliminar(habitacion)">Eliminar</button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4">No hay habitaciones registradas.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (mostrandoFormulario()) {
+    <form class="habitaciones__formulario" (ngSubmit)="guardar()">
+      <h2>{{ habitacionEnEdicion() ? 'Editar habitación' : 'Nueva habitación' }}</h2>
+
+      <label>
+        Número
+        <input type="text" name="numero" [(ngModel)]="formulario.numero" required />
+      </label>
+
+      <label>
+        Tipo de habitación
+        <select name="tipo_habitacion" [(ngModel)]="formulario.tipo_habitacion" required>
+          @for (tipo of tipos(); track tipo.id) {
+            <option [value]="tipo.id">{{ tipo.nombre }}</option>
+          }
+        </select>
+      </label>
+
+      <div class="habitaciones__formulario-acciones">
+        <button type="submit">Guardar</button>
+        <button type="button" (click)="cancelarFormulario()">Cancelar</button>
+      </div>
+    </form>
+  }
+</section>

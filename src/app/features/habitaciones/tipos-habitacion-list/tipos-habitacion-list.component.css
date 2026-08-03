@@ -1,0 +1,36 @@
+/* src/app/features/habitaciones/tipos-habitacion-list/tipos-habitacion-list.component.css */
+.tipos-habitacion__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tipos-habitacion__error {
+  color: #b00020;
+}
+
+.tipos-habitacion__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.tipos-habitacion__tabla th,
+.tipos-habitacion__tabla td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.tipos-habitacion__formulario {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 320px;
+}
+
+.tipos-habitacion__formulario-acciones {
+  display: flex;
+  gap: 0.5rem;
+}

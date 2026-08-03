@@ -1,0 +1,76 @@
+<!-- src/app/features/habitaciones/tipos-habitacion-list/tipos-habitacion-list.component.html -->
+<section class="tipos-habitacion">
+  <header class="tipos-habitacion__header">
+    <h1>Tipos de habitación</h1>
+    <button type="button" (click)="abrirCreacion()">Nuevo tipo</button>
+  </header>
+
+  @if (error()) {
+    <p class="tipos-habitacion__error">{{ error() }}</p>
+  }
+
+  @if (cargando()) {
+    <p>Cargando...</p>
+  } @else {
+    <table class="tipos-habitacion__tabla">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Capacidad</th>
+          <th>Tarifa base</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (tipo of tipos(); track tipo.id) {
+          <tr>
+            <td>{{ tipo.nombre }}</td>
+            <td>{{ tipo.capacidad }}</td>
+            <td>{{ tipo.tarifa_base }}</td>
+            <td>
+              <button type="button" (click)="abrirEdicion(tipo)">Editar</button>
+              <button type="button" (click)="eliminar(tipo)">Eliminar</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4">No hay tipos de habitación registrados.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (mostrandoFormulario()) {
+    <form class="tipos-habitacion__formulario" (ngSubmit)="guardar()">
+      <h2>{{ tipoEnEdicion() ? 'Editar tipo' : 'Nuevo tipo' }}</h2>
+
+      <label>
+        Nombre
+        <input type="text" name="nombre" [(ngModel)]="formulario.nombre" required />
+      </label>
+
+      <label>
+        Capacidad
+        <input type="number" name="capacidad" min="1" [(ngModel)]="formulario.capacidad" required />
+      </label>
+
+      <label>
+        Tarifa base
+        <input
+          type="number"
+          name="tarifa_base"
+          min="0"
+          step="0.01"
+          [(ngModel)]="formulario.tarifa_base"
+          required
+        />
+      </label>
+
+      <div class="tipos-habitacion__formulario-acciones">
+        <button type="submit">Guardar</button>
+        <button type="button" (click)="cancelarFormulario()">Cancelar</button>
+      </div>
+    </form>
+  }
+</section>
