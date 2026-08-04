@@ -1,0 +1,53 @@
+.reservas {
+  padding: 1rem;
+}
+
+.reservas__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.reservas__error {
+  color: #b00020;
+  margin-bottom: 1rem;
+}
+
+.reservas__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.reservas__tabla th,
+.reservas__tabla td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.reservas__acciones button {
+  margin-right: 0.25rem;
+}
+
+.reservas__formulario {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 400px;
+  background-color: #f9f9f9;
+  padding: 1.5rem;
+  border-radius: 4px;
+}
+
+.reservas__formulario-acciones {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.reservas__formulario label {
+  font-weight: bold;
+}

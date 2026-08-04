@@ -1,0 +1,32 @@
+.estadias {
+  padding: 1rem;
+}
+
+.estadias__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.estadias__error {
+  color: #b00020;
+  margin-bottom: 1rem;
+}
+
+.estadias__tabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.estadias__tabla th,
+.estadias__tabla td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+.estadias__acciones button {
+  margin-right: 0.25rem;
+}

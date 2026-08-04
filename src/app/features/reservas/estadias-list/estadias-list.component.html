@@ -1,0 +1,42 @@
+<section class="estadias">
+  <header class="estadias__header">
+    <h1>Estadías</h1>
+  </header>
+  
+  @if (error()) { <p class="estadias__error">{{ error() }}</p> }
+  
+  @if (cargando()) { 
+    <p>Cargando...</p> 
+  } @else {
+    <table class="estadias__tabla">
+      <thead>
+        <tr>
+          <th>Huésped</th>
+          <th>Habitación</th>
+          <th>Fecha Entrada</th>
+          <th>Fecha Salida</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (estadia of estadias(); track estadia.id) {
+          <tr>
+            <td>{{ estadia.huesped_nombre }}</td>
+            <td>{{ estadia.habitacion_numero }}</td>
+            <td>{{ estadia.fecha_entrada }}</td>
+            <td>{{ estadia.fecha_salida || '-' }}</td>
+            <td>{{ estadia.estado }}</td>
+            <td class="estadias__acciones">
+              @if (estadia.estado === 'ACTIVA') {
+                <button type="button" (click)="checkOut(estadia)">Check-out</button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="6">No hay estadías registradas.</td></tr>
+        }
+      </tbody>
+    </table>
+  }
+</section>

@@ -1,0 +1,115 @@
+<section class="reservas">
+  <header class="reservas__header">
+    <h1>Reservas</h1>
+    @if (esAdminOCrecepcion()) {
+      <button type="button" (click)="abrirCreacion()">Nueva reserva</button>
+    }
+  </header>
+  
+  @if (error()) { <p class="reservas__error">{{ error() }}</p> }
+  
+  @if (cargando()) { 
+    <p>Cargando...</p> 
+  } @else {
+    <table class="reservas__tabla">
+      <thead>
+        <tr>
+          <th>Huésped</th>
+          <th>Tipo Hab.</th>
+          <th>Habitación</th>
+          <th>Fecha Inicio</th>
+          <th>Fecha Fin</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (reserva of reservas(); track reserva.id) {
+          <tr>
+            <td>{{ reserva.huesped_nombre }}</td>
+            <td>{{ reserva.tipo_habitacion_nombre }}</td>
+            <td>{{ reserva.habitacion_numero || 'Sin asignar' }}</td>
+            <td>{{ reserva.fecha_inicio }}</td>
+            <td>{{ reserva.fecha_fin }}</td>
+            <td>{{ reserva.estado }}</td>
+            <td class="reservas__acciones">
+              @if (reserva.estado === 'PENDIENTE') {
+                @if (!reserva.habitacion) {
+                  <button type="button" (click)="abrirAsignacion(reserva)">Asignar Hab.</button>
+                } @else {
+                  <button type="button" (click)="hacerCheckIn(reserva)">Check-in</button>
+                }
+                <button type="button" (click)="abrirEdicion(reserva)">Editar</button>
+                <button type="button" (click)="cancelarReserva(reserva)">Cancelar</button>
+              }
+              @if (reserva.estado === 'CONFIRMADA') {
+                @if (reserva.habitacion) {
+                  <button type="button" (click)="hacerCheckIn(reserva)">Check-in</button>
+                }
+                <button type="button" (click)="cancelarReserva(reserva)">Cancelar</button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr><td colspan="7">No hay reservas registradas.</td></tr>
+        }
+      </tbody>
+    </table>
+  }
+
+  @if (mostrandoFormulario()) {
+    <form (ngSubmit)="guardar()" class="reservas__formulario">
+      <h3>{{ reservaEnEdicion() ? 'Editar' : 'Nueva' }} Reserva</h3>
+      
+      <label>Huésped</label>
+      <select name="huesped" [(ngModel)]="formulario.huesped" required>
+        <option [ngValue]="0">Seleccione huésped...</option>
+        @for (h of huespedes(); track h.id) {
+          <option [ngValue]="h.id">{{ h.nombre }}</option>
+        }
+      </select>
+
+      <label>Tipo Habitación</label>
+      <select name="tipo_habitacion" [(ngModel)]="formulario.tipo_habitacion" required>
+        <option [ngValue]="0">Seleccione tipo...</option>
+        @for (t of tiposHabitacion(); track t.id) {
+          <option [ngValue]="t.id">{{ t.nombre }}</option>
+        }
+      </select>
+
+      <label>Fecha Inicio</label>
+      <input type="date" name="fecha_inicio" [(ngModel)]="formulario.fecha_inicio" required />
+
+      <label>Fecha Fin</label>
+      <input type="date" name="fecha_fin" [(ngModel)]="formulario.fecha_fin" required />
+
+      <label>Notas</label>
+      <textarea name="notas" [(ngModel)]="formulario.notas"></textarea>
+
+      <div class="reservas__formulario-acciones">
+        <button type="submit" [disabled]="cargando()">Guardar</button>
+        <button type="button" (click)="cancelarFormulario()" [disabled]="cargando()">Cancelar</button>
+      </div>
+    </form>
+  }
+
+  @if (mostrandoAsignacion()) {
+    <form (ngSubmit)="confirmarAsignacion()" class="reservas__formulario">
+      <h3>Asignar Habitación</h3>
+      <p>Huésped: {{ reservaParaAsignar()?.huesped_nombre }}</p>
+      
+      <label>Habitación Disponible</label>
+      <select name="habitacion_asignada" [(ngModel)]="habitacionAsignadaId" required>
+        <option [ngValue]="0">Seleccione habitación...</option>
+        @for (h of habitacionesDisponibles(); track h.id) {
+          <option [ngValue]="h.id">{{ h.numero }}</option>
+        }
+      </select>
+      
+      <div class="reservas__formulario-acciones">
+        <button type="submit" [disabled]="cargando() || !habitacionAsignadaId">Confirmar</button>
+        <button type="button" (click)="cancelarAsignacion()" [disabled]="cargando()">Cancelar</button>
+      </div>
+    </form>
+  }
+</section>

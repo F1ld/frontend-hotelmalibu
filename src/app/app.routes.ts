@@ -23,5 +23,12 @@ export const routes: Routes = [
     loadChildren: () =>
       import('./features/huespedes/huespedes.routes').then((m) => m.huespedesRoutes),
   },
+  // INICIO MODIFICACIÓN (Fase 3)
+  {
+    path: 'reservas',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/reservas/reservas.routes').then((m) => m.reservasRoutes),
+  },
   // FIN MODIFICACIÓN
 ];
