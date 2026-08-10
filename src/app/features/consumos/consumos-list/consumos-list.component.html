@@ -1,0 +1,131 @@
+<!-- src/app/features/consumos/consumos-list/consumos-list.component.html -->
+
+<div class="cons-container">
+
+  <!-- Header -->
+  <div class="cons-header">
+    <div>
+      <h1 class="cons-title">Registro de Consumos</h1>
+      <p class="cons-subtitle">Carga productos a estadías activas del hotel</p>
+    </div>
+  </div>
+
+  <!-- Error -->
+  @if (error()) {
+    <div class="alert-error">{{ error() }}</div>
+  }
+
+  <!-- Selector de estadía -->
+  <div class="selector-card">
+    <label class="selector-label">Estadía activa</label>
+    @if (cargando()) {
+      <p class="loading-text">Cargando estadías...</p>
+    } @else if (estadiasActivas().length === 0) {
+      <p class="empty-text">No hay estadías activas en este momento.</p>
+    } @else {
+      <select
+        class="selector-select"
+        (change)="seleccionarEstadia(+$any($event.target).value)"
+      >
+        <option value="0">Seleccionar estadía activa...</option>
+        @for (e of estadiasActivas(); track e.id) {
+          <option [value]="e.id">{{ estadiaLabel(e) }}</option>
+        }
+      </select>
+    }
+  </div>
+
+  <!-- Panel de consumos de la estadía seleccionada -->
+  @if (estadiaSeleccionadaId()) {
+    <div class="consumos-panel">
+
+      <div class="panel-header">
+        <h2 class="panel-title">Consumos cargados</h2>
+        <div class="panel-actions">
+          <span class="total-badge">
+            Total: S/ {{ totalConsumos().toFixed(2) }}
+          </span>
+          <button class="btn-primary" (click)="abrirFormulario()">
+            + Agregar Consumo
+          </button>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table class="cons-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Cantidad</th>
+              <th>Precio Unit.</th>
+              <th>Subtotal</th>
+              <th>Registrado por</th>
+              <th>Fecha</th>
+              <th>Notas</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of consumos(); track c.id) {
+              <tr>
+                <td class="nombre-col">{{ c.producto_nombre }}</td>
+                <td class="qty-col">{{ c.cantidad }}</td>
+                <td>S/ {{ c.precio_unitario }}</td>
+                <td class="subtotal-col">
+                  S/ {{ (Number(c.precio_unitario) * c.cantidad).toFixed(2) }}
+                </td>
+                <td>{{ c.registrado_por_nombre || '—' }}</td>
+                <td>{{ c.fecha | slice:0:10 }}</td>
+                <td class="notas-col">{{ c.notas || '—' }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="7" class="empty-row">
+                  No hay consumos registrados para esta estadía aún.
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  }
+
+</div>
+
+<!-- ── Modal: Registrar Consumo ────────────────────────────────────────── -->
+@if (mostrandoFormulario()) {
+  <div class="modal-backdrop" (click)="cerrarFormulario()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Agregar Consumo</h2>
+        <button class="btn-close" (click)="cerrarFormulario()">✕</button>
+      </div>
+      <div class="modal-body">
+        @if (error()) {
+          <div class="alert-error-sm">{{ error() }}</div>
+        }
+
+        <label>Producto *</label>
+        <select [(ngModel)]="formulario.producto">
+          <option [value]="0" disabled>Seleccionar producto...</option>
+          @for (p of productos(); track p.id) {
+            <option [value]="p.id" [disabled]="p.stock_actual <= 0">
+              {{ productoLabel(p) }}
+            </option>
+          }
+        </select>
+
+        <label>Cantidad *</label>
+        <input type="number" min="1" [(ngModel)]="formulario.cantidad" />
+
+        <label>Notas</label>
+        <textarea [(ngModel)]="formulario.notas" rows="2" placeholder="Observaciones opcionales..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarFormulario()">Cancelar</button>
+        <button class="btn-primary" (click)="registrarConsumo()">Registrar</button>
+      </div>
+    </div>
+  </div>
+}

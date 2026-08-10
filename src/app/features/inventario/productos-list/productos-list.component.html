@@ -1,0 +1,178 @@
+<!-- src/app/features/inventario/productos-list/productos-list.component.html -->
+
+<div class="inv-container">
+
+  <!-- Header -->
+  <div class="inv-header">
+    <div>
+      <h1 class="inv-title">Inventario de Productos</h1>
+      <p class="inv-subtitle">Catálogo de artículos y control de stock por tenant</p>
+    </div>
+    <div class="header-actions">
+      @if (totalStockCritico() > 0) {
+        <div class="badge-critico">
+          ⚠️ {{ totalStockCritico() }} producto(s) en stock crítico
+        </div>
+      }
+      @if (puedeGestionarCatalogo) {
+        <button class="btn-primary" (click)="abrirFormProducto()">
+          + Nuevo Producto
+        </button>
+      }
+    </div>
+  </div>
+
+  <!-- Error -->
+  @if (error()) {
+    <div class="alert-error">{{ error() }}</div>
+  }
+
+  <!-- Loading -->
+  @if (cargando()) {
+    <div class="loading">Cargando productos...</div>
+  }
+
+  <!-- Tabla de productos -->
+  @if (!cargando()) {
+    <div class="table-wrapper">
+      <table class="inv-table">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Stock Actual</th>
+            <th>Stock Mínimo</th>
+            <th>Costo</th>
+            <th>Precio</th>
+            <th>Estado</th>
+            @if (puedeGestionarCatalogo) {
+              <th>Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (p of productos(); track p.id) {
+            <tr [class.fila-critica]="p.stock_critico">
+              <td class="nombre-col">{{ p.nombre }}</td>
+              <td>{{ p.categoria || '—' }}</td>
+              <td class="stock-col" [class.stock-bajo]="p.stock_critico">
+                {{ p.stock_actual }}
+              </td>
+              <td>{{ p.stock_minimo }}</td>
+              <td>S/ {{ p.costo }}</td>
+              <td>S/ {{ p.precio }}</td>
+              <td>
+                @if (p.stock_critico) {
+                  <span class="tag tag-alerta">⚠ Crítico</span>
+                } @else {
+                  <span class="tag tag-ok">✓ OK</span>
+                }
+              </td>
+              @if (puedeGestionarCatalogo) {
+                <td class="actions-col">
+                  <button class="btn-sm btn-entrada" (click)="abrirFormEntrada(p)">
+                    + Entrada
+                  </button>
+                  <button class="btn-sm btn-edit" (click)="abrirFormProducto(p)">
+                    Editar
+                  </button>
+                </td>
+              }
+            </tr>
+          } @empty {
+            <tr>
+              <td [attr.colspan]="puedeGestionarCatalogo ? 8 : 7" class="empty-row">
+                No hay productos registrados aún.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+</div>
+
+<!-- ── Modal: Crear / Editar Producto ──────────────────────────────────── -->
+@if (mostrandoFormProducto()) {
+  <div class="modal-backdrop" (click)="cerrarFormProducto()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ productoEnEdicion() ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+        <button class="btn-close" (click)="cerrarFormProducto()">✕</button>
+      </div>
+      <div class="modal-body">
+        <label>Nombre *</label>
+        <input type="text" [(ngModel)]="formularioProducto.nombre" placeholder="Ej: Agua mineral 500ml" />
+
+        <label>Categoría</label>
+        <input type="text" [(ngModel)]="formularioProducto.categoria" placeholder="Ej: Bebidas, Minibar" />
+
+        <div class="form-row">
+          <div>
+            <label>Costo (S/) *</label>
+            <input type="number" step="0.01" min="0" [(ngModel)]="formularioProducto.costo" />
+          </div>
+          <div>
+            <label>Precio de venta (S/) *</label>
+            <input type="number" step="0.01" min="0" [(ngModel)]="formularioProducto.precio" />
+          </div>
+        </div>
+
+        <label>Stock Mínimo</label>
+        <input type="number" min="0" [(ngModel)]="formularioProducto.stock_minimo" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarFormProducto()">Cancelar</button>
+        <button class="btn-primary" (click)="guardarProducto()">
+          {{ productoEnEdicion() ? 'Guardar Cambios' : 'Crear Producto' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Modal: Registrar Entrada de Stock ───────────────────────────────── -->
+@if (mostrandoFormEntrada()) {
+  <div class="modal-backdrop" (click)="cerrarFormEntrada()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Registrar Entrada de Stock</h2>
+        <button class="btn-close" (click)="cerrarFormEntrada()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="producto-info">
+          <span class="label-muted">Producto:</span>
+          <strong>{{ productoParaEntrada()?.nombre }}</strong>
+          <span class="stock-badge">Stock actual: {{ productoParaEntrada()?.stock_actual }}</span>
+        </div>
+
+        <label>Proveedor *</label>
+        <select [(ngModel)]="formularioEntrada.proveedor">
+          <option [value]="0" disabled>Seleccionar proveedor...</option>
+          @for (prov of proveedores(); track prov.id) {
+            <option [value]="prov.id">{{ prov.nombre }}</option>
+          }
+        </select>
+
+        <div class="form-row">
+          <div>
+            <label>Cantidad *</label>
+            <input type="number" min="1" [(ngModel)]="formularioEntrada.cantidad" />
+          </div>
+          <div>
+            <label>Costo unitario (S/) *</label>
+            <input type="number" step="0.01" min="0" [(ngModel)]="formularioEntrada.costo_unitario" />
+          </div>
+        </div>
+
+        <label>Notas</label>
+        <textarea [(ngModel)]="formularioEntrada.notas" rows="2" placeholder="Observaciones opcionales..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarFormEntrada()">Cancelar</button>
+        <button class="btn-primary" (click)="guardarEntrada()">Registrar Entrada</button>
+      </div>
+    </div>
+  </div>
+}

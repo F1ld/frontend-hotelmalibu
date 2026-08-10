@@ -31,4 +31,22 @@ export const routes: Routes = [
       import('./features/reservas/reservas.routes').then((m) => m.reservasRoutes),
   },
   // FIN MODIFICACIÓN
+  // INICIO MODIFICACIÓN (Fase 4)
+  {
+    path: 'inventario',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/inventario/inventario.routes').then(
+        (m) => m.inventarioRoutes
+      ),
+  },
+  {
+    path: 'consumos',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/consumos/consumos.routes').then(
+        (m) => m.consumosRoutes
+      ),
+  },
+  // FIN MODIFICACIÓN
 ];
